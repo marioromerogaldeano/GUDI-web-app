@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import '../styles/login.css'
 
 function LoginPage() {
@@ -9,44 +9,28 @@ function LoginPage() {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
         setLoading(true)
 
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data?.message || 'Credenciales incorrectas')
-            }
-
-            if (data.token) {
-                localStorage.setItem('token', data.token)
-            }
-
+        if (email && password) {
+            localStorage.setItem('token', 'demo-token')
             navigate('/dashboard')
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
-        } finally {
-            setLoading(false)
+        } else {
+            setError('Introduce email y contraseña')
         }
+
+        setLoading(false)
     }
 
     return (
         <div className="login-container">
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className="login-header">
+                    <span className="login-badge">GUDI</span>
                     <h2>Iniciar sesión</h2>
-                    <p>Accede a tu cuenta para continuar</p>
+                    <p>Accede al panel principal para revisar la actividad del sistema</p>
                 </div>
 
                 <div className="input-group">
@@ -80,6 +64,10 @@ function LoginPage() {
                 <button type="submit" disabled={loading}>
                     {loading ? 'Entrando...' : 'Entrar'}
                 </button>
+
+                <p className="login-switch">
+                    ¿No tienes cuenta? <Link to="/register">Regístrate</Link>
+                </p>
             </form>
         </div>
     )
